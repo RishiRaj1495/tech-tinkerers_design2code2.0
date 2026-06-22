@@ -8,7 +8,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
 </head>
-<body>
+<body class="page-loading">
+
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
 
   <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
@@ -16,8 +19,8 @@
   <!-- ── NAV ── -->
   <nav>
     <a href="#home" class="nav-logo">
-      <div class="nav-logo-dot" style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,0.15);">
-       
+      <div class="nav-logo-dot">
+        <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4"/></svg>
       </div>
       Tech Tinkerers
     </a>
@@ -189,6 +192,40 @@
             <a href="#" class="project-link">Explore Case Study →</a>
           </div>
         </div>
+        <div class="project-card" data-category="mobile">
+          <div class="project-thumb">
+            <img src="assets/P 4.png" alt="HealthPulse Fitness App" class="project-img"/>
+          </div>
+          <div class="project-body">
+            <div class="project-tag">Mobile · Health & Fitness</div>
+            <div class="project-name">P 4 — HealthPulse Fitness Tracker</div>
+            <p class="project-desc">A wellness companion app with step counters, heart rate monitoring, calorie tracking, and personalized workout plans.</p>
+            <a href="#" class="project-link">Explore Case Study →</a>
+          </div>
+        </div>
+        <div class="project-card" data-category="desktop">
+          <div class="project-thumb">
+            <img src="assets/P 5.png" alt="TaskFlow Project Manager" class="project-img"/>
+          </div>
+          <div class="project-body">
+            <div class="project-tag">Desktop · Productivity</div>
+            <div class="project-name">P 5 — TaskFlow Project Manager</div>
+            <p class="project-desc">A Kanban-style project management tool with drag-and-drop boards, team collaboration features, and real-time status tracking.</p>
+            <a href="#" class="project-link">Explore Case Study →</a>
+          </div>
+        </div>
+        <div class="project-card" data-category="saas">
+          <div class="project-thumb">
+            <img src="assets/P 6.png" alt="ClientHub CRM Platform" class="project-img"/>
+          </div>
+          <div class="project-body">
+            <div class="project-tag">Saas · CRM Platform</div>
+            <div class="project-name">P 6 — ClientHub CRM</div>
+            <p class="project-desc">A comprehensive CRM dashboard featuring pipeline management, revenue analytics, customer segmentation, and deal tracking.</p>
+            <a href="#" class="project-link">Explore Case Study →</a>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -297,25 +334,29 @@
           </div>
         </div>
         <div class="contact-form">
-          <div class="form-row">
-            <div class="form-group form-group--flush">
-              <label>Full Name</label>
-              <input type="text" id="contactName" placeholder="Your full name"/>
+          <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
+            <input type="hidden" name="access_key" value="b7bcfbe5-9d5c-4e4f-b2a5-fe548422181b">
+            <input type="hidden" name="subject" id="hiddenSubject" value="New Contact Form Submission">
+            <div class="form-row">
+              <div class="form-group form-group--flush">
+                <label>Full Name</label>
+                <input type="text" id="contactName" name="name" placeholder="Your full name"/>
+              </div>
+              <div class="form-group form-group--flush">
+                <label>Email Address</label>
+                <input type="email" id="contactEmail" name="email" placeholder="john@example.com"/>
+              </div>
             </div>
-            <div class="form-group form-group--flush">
-              <label>Email Address</label>
-              <input type="email" id="contactEmail" placeholder="john@example.com"/>
+            <div class="form-group form-group--top-gap">
+              <label>Subject</label>
+              <input type="text" id="contactSubject" name="custom_subject" placeholder="How can I help you?"/>
             </div>
-          </div>
-          <div class="form-group form-group--top-gap">
-            <label>Subject</label>
-            <input type="text" id="contactSubject" placeholder="How can I help you?"/>
-          </div>
-          <div class="form-group">
-            <label>Message</label>
-            <textarea id="contactMessage" placeholder="Share details, dreams, or even a meme …"></textarea>
-          </div>
-          <button class="btn-send" id="sendBtn">Send Message</button>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea id="contactMessage" name="message" placeholder="Share details, dreams, or even a meme …"></textarea>
+            </div>
+            <button type="submit" class="btn-send" id="sendBtn">Send Message</button>
+          </form>
         </div>
       </div>
     </div>
