@@ -640,7 +640,6 @@ function initScrollProgress() {
    13. SMOOTH PAGE ENTRANCE
 ───────────────────────────────────────── */
 function initPageEntrance() {
-  if (window.parent !== window) return;
   document.body.classList.remove('page-loading');
   document.body.classList.add('page-loaded');
 }
