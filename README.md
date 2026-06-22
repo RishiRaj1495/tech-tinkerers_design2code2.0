@@ -5,9 +5,9 @@
 <br/>
 
 <div align="center">
-<h2>🚀 From Wireframe to Reality — in 48 Hours.</h2>
+<h2>🚀 From Wireframe to Reality - in 48 Hours.</h2>
 <p>Team Tech Tinkerers' submission for <strong>Design2Code 2.0</strong>, hosted by <strong>UX Club, VIT Bhopal</strong>.<br/>
-We took a wireframe, brought it to life, and shipped it — no frameworks, no shortcuts.</p>
+We took a wireframe, brought it to life, and shipped it - no frameworks, no shortcuts.</p>
 </div>
 
 ---
@@ -47,7 +47,7 @@ DAY 1 — 21 JUNE · WIREFRAME CHALLENGE
   ▸ Wireframing & Ideation
   ▸ UX Evaluation
 
-DAY 2 — 23 JUNE · FRONTEND DEVELOPMENT
+DAY 2 — 22-23 JUNE · FRONTEND DEVELOPMENT
   ▸ Convert Designs into Code
   ▸ Responsive Development
   ▸ Final Submission
@@ -56,11 +56,11 @@ DAY 2 — 23 JUNE · FRONTEND DEVELOPMENT
 
 ### ✨ Event Highlights
 
-- **Real-World Challenge** — not a toy project
-- **UI/UX + Development** — design thinking meets engineering
-- **Wireframe → Working Product** — end-to-end in 48 hours
-- **Certificates for All** — every participant gets recognized
-- **Showcase Your Skills** — in front of judges and peers
+- **Real-World Challenge**
+- **UI/UX + Development**
+- **Wireframe → Working Product** - end-to-end in 48 hours
+- **Certificates for All** - every participant gets recognized
+- **Showcase Your Skills** - in front of judges and peers
 
 ---
 
@@ -107,10 +107,6 @@ open index.html
 
 > 🔥 Use the **Live Server** extension in VS Code for instant hot-reload while editing.
 
----
-
-## ✦ Team Tech Tinkerers
-
 <div align="center">
 <table>
   <tr>
@@ -132,11 +128,15 @@ open index.html
         <sub><b>Abhilash Singh</b></sub>
       </a>
     </td>
+    <td align="center">
+      <a href="https://github.com/ari9516">
+        <img src="https://avatars.githubusercontent.com/ari9516" width="80px" style="border-radius:50%; border: 2px solid #c8f135;" alt="ari9516"/><br/>
+        <sub><b>ari9516</b></sub>
+      </a>
+    </td>
   </tr>
 </table>
 </div>
-
----
 
 ## 📄 License
 
