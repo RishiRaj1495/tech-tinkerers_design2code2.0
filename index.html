@@ -143,11 +143,18 @@
     .hero-photo-card {
       width: 240px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
     }
-    .hero-photo-placeholder {
-      width: 100%; height: 180px; background: var(--bg-gray);
-      display: flex; align-items: center; justify-content: center;
+    .hero-photo-container {
+      width: 100%; height: 240px; background: var(--bg-gray);
+      overflow: hidden;
+      position: relative;
     }
-    .hero-photo-placeholder svg { width: 40px; height: 40px; opacity: 0.3; }
+    .hero-profile-img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-photo-card:hover .hero-profile-img {
+      transform: scale(1.06);
+    }
     .hero-status {
       padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
       border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted);
@@ -155,10 +162,19 @@
     .toggle {
       width: 36px; height: 20px; background: var(--green);
       border-radius: 10px; position: relative; cursor: pointer; flex-shrink: 0;
+      transition: background-color 0.25s ease;
     }
     .toggle::after {
       content: ''; width: 14px; height: 14px; background: white; border-radius: 50%;
-      position: absolute; top: 3px; right: 4px; transition: right 0.2s;
+      position: absolute; top: 3px; left: 3px;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateX(16px);
+    }
+    .toggle.off {
+      background: #D1D5DB;
+    }
+    .toggle.off::after {
+      transform: translateX(0);
     }
 
     /* ── ABOUT ── */
@@ -227,10 +243,22 @@
     .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
     .project-card {
       background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .project-card.hide-card {
+      display: none;
     }
     .project-thumb {
       width: 100%; height: 160px; background: var(--bg-gray);
-      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .project-img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .project-card:hover .project-img {
+      transform: scale(1.06);
     }
     .project-body { padding: 16px; }
     .project-tag {
@@ -273,10 +301,18 @@
     .contact-layout { display: grid; grid-template-columns: 1fr 1.1fr; gap: 32px; align-items: start; }
     .contact-info { display: flex; flex-direction: column; gap: 18px; }
     .contact-item { display: flex; align-items: center; gap: 10px; }
+    .contact-item-link {
+      text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px; transition: transform 0.2s; width: 100%;
+    }
+    .contact-item-link:hover { transform: translateX(4px); }
+    .contact-item-link:hover .contact-item-value { color: var(--blue); }
     .contact-item-icon {
       width: 32px; height: 32px; background: white; border: 1px solid var(--border);
       border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: border-color 0.2s, background-color 0.2s;
     }
+    .contact-item-link:hover .contact-item-icon { border-color: var(--blue); background-color: var(--blue-light); }
+    .contact-item-link:hover .contact-item-icon svg { stroke: var(--blue); }
     .contact-item-icon svg { width: 14px; height: 14px; stroke: var(--text-muted); fill: none; stroke-width: 1.8; }
     .contact-item-label { font-size: 10px; color: var(--text-light); margin-bottom: 1px; }
     .contact-item-value { font-size: 12px; font-weight: 500; word-break: break-all; }
@@ -323,10 +359,17 @@
     }
     .footer-social:hover { border-color: #9CA3AF; }
     .footer-social svg { width: 13px; height: 13px; stroke: var(--text-muted); fill: none; stroke-width: 1.8; }
-    .footer-badge { font-size: 11px; color: var(--text-light); display: flex; align-items: center; gap: 6px; }
+    .footer-badge {
+      font-size: 11px; color: var(--text-light); display: flex; align-items: center; gap: 6px;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .footer-badge:hover {
+      opacity: 0.8;
+    }
     .footer-badge span {
       background: var(--bg-gray); border: 1px solid var(--border);
       padding: 3px 10px; border-radius: 20px; font-size: 10px;
+      cursor: pointer;
     }
 
     /* ════════════════════════════
@@ -398,9 +441,204 @@
       .hero h1 { font-size: 22px; }
       .btn-primary, .btn-outline { padding: 8px 14px; font-size: 12px; }
     }
+
+    /* ── CUSTOM MODALS ── */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(17, 24, 39, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 24px;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-container {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 85vh;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-overlay.open .modal-container {
+      transform: scale(1);
+    }
+    .modal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 50%;
+      transition: background 0.2s, color 0.2s;
+    }
+    .modal-close:hover {
+      background: var(--bg-gray);
+      color: var(--text);
+    }
+    .modal-close svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .modal-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      background: var(--bg-gray);
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+
+    /* Resume specifics */
+    .resume-section { margin-bottom: 20px; }
+    .resume-sec-title {
+      font-size: 11px; font-weight: 600; color: var(--blue);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+      border-bottom: 1px solid var(--border); padding-bottom: 4px;
+    }
+    .resume-item { margin-bottom: 12px; }
+    .resume-item-header { display: flex; justify-content: space-between; font-weight: 600; font-size: 12px; color: var(--text); }
+    .resume-item-sub { font-size: 11px; color: var(--text-muted); font-style: italic; }
+    .resume-item-desc { font-size: 11px; margin-top: 4px; }
+    .resume-bullet-list { margin-left: 14px; margin-top: 4px; }
+    .resume-bullet-list li { font-size: 11px; margin-bottom: 2px; }
+
+    /* ── TOAST NOTIFICATIONS ── */
+    .toast-container {
+      position: fixed;
+      top: 24px; right: 24px;
+      z-index: 2000;
+      display: flex; flex-direction: column; gap: 12px;
+      pointer-events: none;
+    }
+    .toast {
+      background: white; border: 1px solid var(--border); border-left: 4px solid var(--green); border-radius: 8px;
+      padding: 14px 18px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+      display: flex; align-items: center; gap: 12px; width: 320px;
+      pointer-events: auto; transform: translateX(120%); opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+    }
+    .toast.show {
+      transform: translateX(0); opacity: 1;
+    }
+    .toast-error {
+      border-left-color: #EF4444;
+    }
+    .toast-icon {
+      width: 18px; height: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    }
+    .toast-icon svg { width: 100%; height: 100%; }
+    .toast-content { flex: 1; }
+    .toast-title { font-size: 12px; font-weight: 600; color: var(--text); }
+    .toast-message { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    /* Form error highlights */
+    .form-group input.error-field,
+    .form-group textarea.error-field {
+      border-color: #EF4444;
+      background-color: #FEF2F2;
+    }
+
+    /* ── MOBILE PREVIEW OVERLAY ── */
+    .mobile-preview-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(17, 24, 39, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1500;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 20px;
+    }
+    .mobile-preview-overlay.open {
+      opacity: 1; pointer-events: auto;
+    }
+    .preview-toolbar {
+      margin-bottom: 16px; display: flex; gap: 12px; align-items: center;
+    }
+    .preview-toolbar button {
+      background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white; padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: 500;
+      cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s;
+    }
+    .preview-toolbar button:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+    .phone-shell {
+      width: 320px; height: 640px; background: #111;
+      border: 10px solid #2d2d2d; border-radius: 36px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      position: relative; overflow: hidden;
+      transition: width 0.3s, height 0.3s, border-radius 0.3s;
+      display: flex; flex-direction: column;
+    }
+    .phone-shell.landscape {
+      width: 640px; height: 320px; border-radius: 36px;
+    }
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 20px; background: #2d2d2d;
+      border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
+      z-index: 10; display: flex; align-items: center; justify-content: center;
+    }
+    .phone-notch::before {
+      content: ''; width: 36px; height: 4px; background: #444; border-radius: 2px;
+    }
+    .phone-screen {
+      width: 100%; height: 100%; background: white; overflow: hidden; position: relative;
+    }
+    .phone-screen iframe {
+      width: 100%; height: 100%; border: none; background: white; display: block;
+    }
   </style>
 </head>
 <body>
+  <!-- Toast Container for Notifications -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <!-- NAV -->
   <nav>
@@ -416,7 +654,7 @@
       <li><a href="#expertise">Skills</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
-    <a href="#" class="nav-resume-btn">Resume</a>
+    <a href="#" class="nav-resume-btn" id="desktopResumeBtn">Resume</a>
     <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
@@ -428,14 +666,14 @@
     <a href="#projects" class="drawer-link">Projects</a>
     <a href="#expertise" class="drawer-link">Skills</a>
     <a href="#contact" class="drawer-link">Contact</a>
-    <a href="#" class="nav-resume-btn">Resume</a>
+    <a href="#" class="nav-resume-btn" id="mobileResumeBtn">Resume</a>
   </div>
 
   <!-- HERO -->
   <section class="hero" id="home">
     <div class="container">
       <div class="hero-left">
-        <div class="hero-eyebrow">Available for Projects</div>
+        <div class="hero-eyebrow" id="availabilityStatus">Available for Projects</div>
         <h1>Tech Tinkerers</h1>
         <div class="hero-subtitle">Designer &amp; Strategist</div>
         <p class="hero-desc">
@@ -449,10 +687,8 @@
       </div>
       <div class="hero-right">
         <div class="hero-photo-card">
-          <div class="hero-photo-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.2">
-              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-            </svg>
+          <div class="hero-photo-container">
+            <img src="assets/profile.jpg" alt="Tech Tinkerers Profile Photo" class="hero-profile-img" />
           </div>
           <div class="hero-status">
             <span>Current Work Status</span>
@@ -468,7 +704,7 @@
     <div class="container">
       <h2>About Me</h2>
       <p class="about-lead">Blending technical proficiency with aesthetic sensitivity to solve complex problems.</p>
-      <a href="#" class="about-link">Read full bio →</a>
+      <a href="#" class="about-link" id="readBioBtn">Read full bio →</a>
       <div class="about-grid">
         <div class="about-card">
           <div class="about-card-title"><span class="dot"></span> My Approach</div>
@@ -536,48 +772,43 @@
           <p>A selection of works that demonstrate architectural clarity and functional elegance.</p>
         </div>
         <div class="filter-tabs">
-          <button class="filter-tab active">Mobile</button>
-          <button class="filter-tab">Desktop</button>
-          <button class="filter-tab">Saas</button>
+          <button class="filter-tab active" data-filter="all">All</button>
+          <button class="filter-tab" data-filter="mobile">Mobile</button>
+          <button class="filter-tab" data-filter="desktop">Desktop</button>
+          <button class="filter-tab" data-filter="saas">Saas</button>
         </div>
       </div>
-      <div class="projects-grid">
-        <div class="project-card">
+      <div class="projects-grid" id="projectsGrid">
+        <div class="project-card" data-category="mobile">
           <div class="project-thumb">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.2">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
-            </svg>
+            <img src="assets/P 1.png" alt="Fintech Mobile Wallet" class="project-img" />
           </div>
           <div class="project-body">
-            <div class="project-tag">Category · Subtype</div>
-            <div class="project-name">P 1 — Project Title</div>
-            <p class="project-desc">Placeholder description text goes here. Brief summary of the project and the problem solved.</p>
+            <div class="project-tag">Mobile · iOS App</div>
+            <div class="project-name">P 1 — Fintech Mobile Wallet</div>
+            <p class="project-desc">A beautiful design for a personal finance and mobile payment system, focusing on card management and quick transfers.</p>
             <a href="#" class="project-link">Explore Case Study →</a>
           </div>
         </div>
-        <div class="project-card">
+        <div class="project-card" data-category="desktop">
           <div class="project-thumb">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.2">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
-            </svg>
+            <img src="assets/P 2.png" alt="TechTinkerers IDE Editor" class="project-img" />
           </div>
           <div class="project-body">
-            <div class="project-tag">Category · Subtype</div>
-            <div class="project-name">P 2 — Project Title</div>
-            <p class="project-desc">Placeholder description text goes here. Brief summary of the project and the problem solved.</p>
+            <div class="project-tag">Desktop · Developer Tools</div>
+            <div class="project-name">P 2 — TechTinkerers IDE Editor</div>
+            <p class="project-desc">An interactive coding IDE interface designed for smooth code navigation, file trees, and terminal integration.</p>
             <a href="#" class="project-link">Explore Case Study →</a>
           </div>
         </div>
-        <div class="project-card">
+        <div class="project-card" data-category="saas">
           <div class="project-thumb">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.2">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
-            </svg>
+            <img src="assets/P 3.png" alt="Cloud Analytics Platform" class="project-img" />
           </div>
           <div class="project-body">
-            <div class="project-tag">Category · Subtype</div>
-            <div class="project-name">P 3 — Project Title</div>
-            <p class="project-desc">Placeholder description text goes here. Brief summary of the project and the problem solved.</p>
+            <div class="project-tag">Saas · Analytics Dashboard</div>
+            <div class="project-name">P 3 — Cloud Analytics Platform</div>
+            <p class="project-desc">A professional dashboard showcasing complex analytics data, server health metrics, and visual performance charts.</p>
             <a href="#" class="project-link">Explore Case Study →</a>
           </div>
         </div>
@@ -644,60 +875,68 @@
       <div class="contact-layout">
         <div class="contact-info">
           <div class="contact-item">
-            <div class="contact-item-icon">
-              <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </div>
-            <div>
-              <div class="contact-item-label">Email / DM</div>
-              <div class="contact-item-value">placeholder@designer.com</div>
-            </div>
+            <a href="mailto:placeholder@designer.com" class="contact-item-link">
+              <div class="contact-item-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <div class="contact-item-label">Email / DM</div>
+                <div class="contact-item-value">placeholder@designer.com</div>
+              </div>
+            </a>
           </div>
           <div class="contact-item">
-            <div class="contact-item-icon">
-              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            </div>
-            <div>
-              <div class="contact-item-label">Call / Text</div>
-              <div class="contact-item-value">+1 (234) 5678900</div>
-            </div>
+            <a href="tel:+12345678900" class="contact-item-link">
+              <div class="contact-item-icon">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <div>
+                <div class="contact-item-label">Call / Text</div>
+                <div class="contact-item-value">+1 (234) 5678900</div>
+              </div>
+            </a>
           </div>
           <div class="contact-item">
-            <div class="contact-item-icon">
-              <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            </div>
-            <div>
-              <div class="contact-item-label">Location</div>
-              <div class="contact-item-value">STATE, COUNTRY</div>
-            </div>
+            <a href="https://maps.google.com/?q=VIT+Bhopal+University" target="_blank" rel="noopener noreferrer" class="contact-item-link">
+              <div class="contact-item-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <div class="contact-item-label">Location</div>
+                <div class="contact-item-value">VIT Bhopal, India</div>
+              </div>
+            </a>
           </div>
           <div class="contact-item">
-            <div class="contact-item-icon">
-              <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-            </div>
-            <div>
-              <div class="contact-item-label">LinkedIn</div>
-              <div class="contact-item-value">linkedin.in / ……</div>
-            </div>
+            <a href="https://www.linkedin.com/company/uxclub/" target="_blank" rel="noopener noreferrer" class="contact-item-link">
+              <div class="contact-item-icon">
+                <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              </div>
+              <div>
+                <div class="contact-item-label">LinkedIn</div>
+                <div class="contact-item-value">linkedin.com/company/uxclub</div>
+              </div>
+            </a>
           </div>
         </div>
         <div class="contact-form">
           <div class="form-row">
             <div class="form-group" style="margin-bottom:0">
               <label>Full Name</label>
-              <input type="text" placeholder="Your full name" />
+              <input type="text" id="contactName" placeholder="Your full name" />
             </div>
             <div class="form-group" style="margin-bottom:0">
               <label>Email Address</label>
-              <input type="email" placeholder="john@example.com" />
+              <input type="email" id="contactEmail" placeholder="john@example.com" />
             </div>
           </div>
           <div class="form-group" style="margin-top:12px">
             <label>Subject</label>
-            <input type="text" placeholder="How can I help you?" />
+            <input type="text" id="contactSubject" placeholder="How can I help you?" />
           </div>
           <div class="form-group">
             <label>Message</label>
-            <textarea placeholder="Share details, dreams, or even a meme …"></textarea>
+            <textarea id="contactMessage" placeholder="Share details, dreams, or even a meme …"></textarea>
           </div>
           <button class="btn-send" id="sendBtn">Send Message</button>
         </div>
@@ -710,24 +949,130 @@
     <div class="footer-inner">
       <span class="footer-copy">Find me on your socials</span>
       <div class="footer-socials">
-        <a href="#" class="footer-social" aria-label="Twitter">
+        <a href="https://x.com/" class="footer-social" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
           <svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
         </a>
-        <a href="#" class="footer-social" aria-label="Instagram">
+        <a href="https://www.instagram.com/uxclub.vitb/" class="footer-social" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
           <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
         </a>
-        <a href="#" class="footer-social" aria-label="GitHub">
+        <a href="https://github.com/RishiRaj1495" class="footer-social" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
           <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
         </a>
-        <a href="#" class="footer-social" aria-label="LinkedIn">
+        <a href="https://www.linkedin.com/company/uxclub/" class="footer-social" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
           <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
         </a>
       </div>
-      <div class="footer-badge">
+      <div class="footer-badge" id="mobilePreviewBtn">
         <span>Switch to Mobile Window</span>
       </div>
     </div>
   </footer>
+
+  <!-- RESUME MODAL -->
+  <div class="modal-overlay" id="resumeModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Curriculum Vitae — Rishi Raj</h3>
+        <button class="modal-close" id="closeResumeBtn" aria-label="Close modal">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="resume-section">
+          <div class="resume-sec-title">Education</div>
+          <div class="resume-item">
+            <div class="resume-item-header">
+              <span>VIT Bhopal University</span>
+              <span>2024 – Present</span>
+            </div>
+            <div class="resume-item-sub">B.Tech in Computer Science (Spec. in Gaming Technology)</div>
+          </div>
+        </div>
+        <div class="resume-section">
+          <div class="resume-sec-title">Experience</div>
+          <div class="resume-item">
+            <div class="resume-item-header">
+              <span>UX Club, VIT Bhopal</span>
+              <span>2024 – Present</span>
+            </div>
+            <div class="resume-item-sub">Core Member / UI-UX Lead &amp; Strategist</div>
+            <div class="resume-item-desc">Organizing workshops, designing curriculum-focused digital assets, and guiding design strategy across college-level hackathons and web dev events.</div>
+          </div>
+          <div class="resume-item">
+            <div class="resume-item-header">
+              <span>Freelance Interaction Designer</span>
+              <span>2023 – Present</span>
+            </div>
+            <div class="resume-item-sub">Independent Designer</div>
+            <ul class="resume-bullet-list">
+              <li>Created clean website prototypes and custom dashboards for startups.</li>
+              <li>Collaborated on design system kits for developer handoffs.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="resume-section">
+          <div class="resume-sec-title">Skills &amp; Competencies</div>
+          <div class="resume-item">
+            <div class="resume-item-header">
+              <span>UI/UX Design</span>
+            </div>
+            <div class="resume-item-desc">User Journeys, Figma Prototyping, Wireframing, Grid Layouts, Color Theory, Typography, Branding &amp; Identity.</div>
+          </div>
+          <div class="resume-item">
+            <div class="resume-item-header">
+              <span>Front-End Dev</span>
+            </div>
+            <div class="resume-item-desc">HTML5, CSS3 (Modern grids &amp; flexbox), JavaScript (ES6+), React.js core, responsive layouts, web accessibility standards.</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" id="closeResumeFooterBtn">Close</button>
+        <button class="btn-primary" id="downloadResumeBtn">Download TXT Resume</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BIO MODAL -->
+  <div class="modal-overlay" id="bioModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Biography — About Me</h3>
+        <button class="modal-close" id="closeBioBtn" aria-label="Close modal">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:14px"><strong>Hello! I'm Rishi Raj.</strong></p>
+        <p style="margin-bottom:14px">I am currently pursuing my BTech degree at VIT Bhopal University. I serve as a Core Member of the <strong>UX Club at VIT Bhopal</strong>, where I work with a group of passionate designers and programmers. We aim to promote user-centered design paradigms and bridge the gap between design theory and technical implementation.</p>
+        <p style="margin-bottom:14px">My approach focuses on simplicity, clear visual hierarchy, and developer-friendly design assets. I believe that digital interfaces should be effortless to use and visually pleasing. That is why I design in Figma, and build using modern front-end technologies like React, custom CSS, and responsive HTML frameworks.</p>
+        <p>I am actively looking for design challenges, internships, and collaborations where I can contribute my skillsets in interaction layout design and product development. Let's make things that matter!</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="closeBioFooterBtn">Close Bio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE PREVIEW OVERLAY -->
+  <div class="mobile-preview-overlay" id="mobilePreviewOverlay">
+    <div class="preview-toolbar">
+      <button id="rotatePreviewBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        Rotate View
+      </button>
+      <button id="closePreviewBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        Exit Preview
+      </button>
+    </div>
+    <div class="phone-shell" id="phoneShell">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <iframe id="previewIframe" src="about:blank"></iframe>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Smooth scroll
@@ -740,45 +1085,310 @@
       });
     });
 
-    // Hamburger
+    // Hamburger drawer toggle
     const hamburger = document.getElementById('hamburger');
     const drawer = document.getElementById('navDrawer');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      drawer.classList.toggle('open');
-    });
-    // Close drawer on link click
-    drawer.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => {
-        hamburger.classList.remove('open');
-        drawer.classList.remove('open');
+    if (hamburger && drawer) {
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('open');
+        drawer.classList.toggle('open');
       });
-    });
+      // Close drawer on link click
+      drawer.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          hamburger.classList.remove('open');
+          drawer.classList.remove('open');
+        });
+      });
+    }
 
-    // Filter tabs
+    // Modal Handling Helper
+    function setupModal(triggerIds, modalId, closeIds) {
+      const modal = document.getElementById(modalId);
+      if (!modal) return;
+
+      triggerIds.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+          });
+        }
+      });
+
+      closeIds.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+          });
+        }
+      });
+
+      // Close modal on click outside the container
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+      });
+    }
+
+    // Initialize modals
+    setupModal(['desktopResumeBtn', 'mobileResumeBtn'], 'resumeModal', ['closeResumeBtn', 'closeResumeFooterBtn']);
+    setupModal(['readBioBtn'], 'bioModal', ['closeBioBtn', 'closeBioFooterBtn']);
+
+    // Download Resume action
+    const downloadResumeBtn = document.getElementById('downloadResumeBtn');
+    if (downloadResumeBtn) {
+      downloadResumeBtn.addEventListener('click', () => {
+        const resumeContent = `
+=========================================
+          RISHI RAJ - RESUME
+=========================================
+
+EDUCATION:
+- VIT Bhopal University (2024 - Present)
+  B.Tech in Computer Science & Engineering (Spec. in Gaming Technology)
+
+EXPERIENCE:
+- UX Club, VIT Bhopal (2024 - Present)
+  Core Member / UI-UX Lead & Strategist
+  Organized interaction design workshops, drafted college-level guidelines, led visual design strategy for local hackathons.
+  
+- Freelance Interaction Designer (2023 - Present)
+  Created functional web UI prototypes, wireframes, and design components.
+
+SKILLS:
+- UI/UX: Wireframing, Prototyping, Figma, User Research, Visual Design
+- Dev: HTML5, CSS3, JavaScript (ES6+), React.js core, GitHub, Responsive Design
+
+CONTACT:
+- Email: placeholder@designer.com
+- LinkedIn: linkedin.com/company/uxclub/
+- Location: VIT Bhopal, India
+=========================================
+`;
+        const blob = new Blob([resumeContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'RishiRaj_Resume.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // Show successful download toast
+        showToast("Download Triggered", "RishiRaj_Resume.txt has been downloaded successfully.", "success");
+      });
+    }
+
+    // Projects Filtering
     document.querySelectorAll('.filter-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
+
+        const filter = tab.getAttribute('data-filter') || 'all';
+        const projectCards = document.querySelectorAll('.project-card');
+
+        projectCards.forEach(card => {
+          const category = card.getAttribute('data-category');
+          if (filter === 'all' || category === filter) {
+            card.classList.remove('hide-card');
+            // Allow display change to settle, then fade in
+            setTimeout(() => {
+              card.style.opacity = '1';
+              card.style.transform = 'scale(1)';
+            }, 50);
+          } else {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            // Hide after the opacity fade ends
+            setTimeout(() => {
+              card.classList.add('hide-card');
+            }, 300);
+          }
+        });
       });
     });
 
-    // Status toggle
-    let on = true;
-    document.getElementById('statusToggle').addEventListener('click', function() {
-      on = !on;
-      this.style.background = on ? '#22C55E' : '#6B7280';
-    });
+    // Status Toggle
+    const statusToggle = document.getElementById('statusToggle');
+    const availabilityStatus = document.getElementById('availabilityStatus');
+    if (statusToggle && availabilityStatus) {
+      statusToggle.addEventListener('click', () => {
+        statusToggle.classList.toggle('off');
+        const isOff = statusToggle.classList.contains('off');
+        
+        availabilityStatus.textContent = isOff ? 'Busy / Booked' : 'Available for Projects';
+        availabilityStatus.style.color = isOff ? 'var(--text-light)' : 'var(--blue)';
+        
+        // Show status update toast
+        showToast(
+          "Status Updated", 
+          isOff ? "You have set your status to Busy." : "You are now Available for projects!", 
+          "success"
+        );
+      });
+    }
 
-    // Send button
-    document.getElementById('sendBtn').addEventListener('click', function() {
-      this.textContent = 'Message Sent ✓';
-      this.style.background = '#22C55E';
+    // Custom Toast Notification System
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = `toast ${type === 'error' ? 'toast-error' : ''}`;
+      
+      const successIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+      const errorIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+
+      toast.innerHTML = `
+        <div class="toast-icon">
+          ${type === 'error' ? errorIcon : successIcon}
+        </div>
+        <div class="toast-content">
+          <div class="toast-title">${title}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+      `;
+
+      container.appendChild(toast);
+
+      // Slide in
       setTimeout(() => {
-        this.textContent = 'Send Message';
-        this.style.background = '';
-      }, 2500);
-    });
+        toast.classList.add('show');
+      }, 50);
+
+      // Slide out and remove
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.remove();
+        }, 400);
+      }, 4000);
+    }
+
+    // Contact Form Validation & Submission
+    const sendBtn = document.getElementById('sendBtn');
+    if (sendBtn) {
+      sendBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const nameField = document.getElementById('contactName');
+        const emailField = document.getElementById('contactEmail');
+        const subjectField = document.getElementById('contactSubject');
+        const messageField = document.getElementById('contactMessage');
+
+        let isValid = true;
+
+        // Reset field errors
+        [nameField, emailField, subjectField, messageField].forEach(field => {
+          if (field) field.classList.remove('error-field');
+        });
+
+        // Name Validation
+        if (!nameField || nameField.value.trim() === '') {
+          if (nameField) nameField.classList.add('error-field');
+          isValid = false;
+        }
+
+        // Email Validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailField || !emailRegex.test(emailField.value.trim())) {
+          if (emailField) emailField.classList.add('error-field');
+          isValid = false;
+        }
+
+        // Subject Validation
+        if (!subjectField || subjectField.value.trim() === '') {
+          if (subjectField) subjectField.classList.add('error-field');
+          isValid = false;
+        }
+
+        // Message Validation
+        if (!messageField || messageField.value.trim() === '') {
+          if (messageField) messageField.classList.add('error-field');
+          isValid = false;
+        }
+
+        if (!isValid) {
+          showToast("Form Validation Failed", "Please fill in all fields with valid information.", "error");
+          return;
+        }
+
+        // Submit simulation
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending Message...';
+        sendBtn.style.background = '#6B7280';
+
+        setTimeout(() => {
+          showToast("Message Sent Successfully!", "Thanks for connecting. I will get back to you shortly.", "success");
+          
+          // Clear inputs
+          [nameField, emailField, subjectField, messageField].forEach(field => {
+            if (field) field.value = '';
+          });
+
+          sendBtn.textContent = 'Message Sent ✓';
+          sendBtn.style.background = '#22C55E';
+
+          setTimeout(() => {
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send Message';
+            sendBtn.style.background = '';
+          }, 2500);
+        }, 1200);
+      });
+    }
+
+    // Mobile Preview Simulator Functionality
+    const mobilePreviewBtn = document.getElementById('mobilePreviewBtn');
+    const mobilePreviewOverlay = document.getElementById('mobilePreviewOverlay');
+    const rotatePreviewBtn = document.getElementById('rotatePreviewBtn');
+    const closePreviewBtn = document.getElementById('closePreviewBtn');
+    const phoneShell = document.getElementById('phoneShell');
+    const previewIframe = document.getElementById('previewIframe');
+
+    if (mobilePreviewBtn && mobilePreviewOverlay && previewIframe) {
+      mobilePreviewBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        mobilePreviewOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        
+        // Load the current URL into the simulator frame
+        previewIframe.src = window.location.href;
+      });
+
+      const closeSimulator = () => {
+        mobilePreviewOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+        previewIframe.src = 'about:blank'; // Unload iframe page
+      };
+
+      if (closePreviewBtn) {
+        closePreviewBtn.addEventListener('click', closeSimulator);
+      }
+
+      // Close if clicking overlay container directly (outside phone shell & toolbar)
+      mobilePreviewOverlay.addEventListener('click', (e) => {
+        if (e.target === mobilePreviewOverlay) {
+          closeSimulator();
+        }
+      });
+
+      if (rotatePreviewBtn && phoneShell) {
+        rotatePreviewBtn.addEventListener('click', () => {
+          phoneShell.classList.toggle('landscape');
+        });
+      }
+    }
   </script>
 </body>
 </html>
