@@ -169,31 +169,39 @@ function initResumeDownload() {
    5. PROJECT FILTERING
 ───────────────────────────────────────── */
 function initProjectFilter() {
-  const FADE_DURATION_MS = 300;
+  const FADE_OUT_MS = 250;  // matches .projects-grid.filtering transition
+
+  const grid = document.querySelector('.projects-grid');
+  if (!grid) return;
 
   qsa('.filter-tab').forEach((tab) => {
     tab.addEventListener('click', () => {
+      // Update active tab
       qsa('.filter-tab').forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
 
       const filter = tab.dataset.filter ?? 'all';
 
-      qsa('.project-card').forEach((card) => {
-        const matches = filter === 'all' || card.dataset.category === filter;
+      // Phase 1: fade entire grid out
+      grid.classList.add('filtering');
 
-        if (matches) {
-          card.classList.remove('hide-card');
-          // Allow display to register, then fade in
-          requestAnimationFrame(() => {
-            card.style.opacity = '1';
-            card.style.transform = 'scale(1)';
-          });
-        } else {
-          card.style.opacity = '0';
-          card.style.transform = 'scale(0.95)';
-          setTimeout(() => card.classList.add('hide-card'), FADE_DURATION_MS);
-        }
-      });
+      // Phase 2: after fade-out, toggle cards and fade grid back in
+      setTimeout(() => {
+        qsa('.project-card').forEach((card) => {
+          const matches = filter === 'all' || card.dataset.category === filter;
+          card.classList.toggle('hide-card', !matches);
+
+          // Re-trigger the per-card entry animation
+          if (matches) {
+            card.style.animation = 'none';
+            void card.offsetHeight; // force reflow
+            card.style.animation = '';
+          }
+        });
+
+        // Fade grid back in
+        grid.classList.remove('filtering');
+      }, FADE_OUT_MS);
     });
   });
 }
@@ -299,8 +307,9 @@ function showToast(title, message, type = 'success') {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function initContactForm() {
+  const form = el('contactForm');
   const sendBtn = el('sendBtn');
-  if (!sendBtn) return;
+  if (!form || !sendBtn) return;
 
   const fields = {
     name: el('contactName'),
@@ -346,8 +355,9 @@ function initContactForm() {
   function setButtonState(state) {
     const states = {
       idle: { text: 'Send Message', disabled: false, bg: '' },
-      loading: { text: 'Sending Message…', disabled: true, bg: '#6B7280' },
-      success: { text: 'Message Sent ✓', disabled: true, bg: '#22C55E' },
+      loading: { text: 'Sending Message\u2026', disabled: true, bg: '#6B7280' },
+      success: { text: 'Message Sent \u2713', disabled: true, bg: '#22C55E' },
+      error: { text: 'Failed \u2014 Retry', disabled: false, bg: '#EF4444' },
     };
     const s = states[state];
     sendBtn.textContent = s.text;
@@ -355,7 +365,7 @@ function initContactForm() {
     sendBtn.style.background = s.bg;
   }
 
-  sendBtn.addEventListener('click', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     resetErrors();
 
@@ -364,15 +374,38 @@ function initContactForm() {
       return;
     }
 
+    // Sync the user-facing subject into the hidden Web3Forms subject field
+    const hiddenSubject = el('hiddenSubject');
+    if (hiddenSubject && fields.subject) {
+      hiddenSubject.value = fields.subject.value.trim();
+    }
+
     setButtonState('loading');
 
-    setTimeout(() => {
-      showToast('Message Sent Successfully!', 'Thanks for connecting. I will get back to you shortly.');
-      clearFields();
-      setButtonState('success');
+    try {
+      const formData = new FormData(form);
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData,
+      });
 
-      setTimeout(() => setButtonState('idle'), 2500);
-    }, 1200);
+      const result = await response.json();
+
+      if (result.success) {
+        showToast('Message Sent Successfully!', 'Thanks for connecting. I will get back to you shortly.');
+        clearFields();
+        setButtonState('success');
+        setTimeout(() => setButtonState('idle'), 2500);
+      } else {
+        showToast('Submission Failed', result.message || 'Something went wrong. Please try again.', 'error');
+        setButtonState('error');
+        setTimeout(() => setButtonState('idle'), 3000);
+      }
+    } catch (err) {
+      showToast('Network Error', 'Could not reach the server. Check your connection and try again.', 'error');
+      setButtonState('error');
+      setTimeout(() => setButtonState('idle'), 3000);
+    }
   });
 }
 
@@ -525,6 +558,197 @@ function initCrossFrameSync() {
 }
 
 /* ─────────────────────────────────────────
+   11. SCROLL REVEAL
+───────────────────────────────────────── */
+function initScrollReveal() {
+  // Don't animate inside iframes (mobile preview)
+  if (window.parent !== window) return;
+
+  // Elements to reveal on scroll (single items)
+  const revealSelectors = [
+    '.hero-left',
+    '.hero-right',
+    '.about h2',
+    '.about-lead',
+    '.about-link',
+    '.section-header',
+    '.section-header-row',
+    '.contact h2',
+    '.contact-lead',
+    '.contact-form',
+    '.expertise-divider',
+  ];
+
+  // Grid children to reveal with stagger
+  const staggerSelectors = [
+    '.about-card',
+    '.project-card',
+    '.expertise-card',
+    '.contact-item',
+  ];
+
+  // Add .reveal class to single items
+  revealSelectors.forEach((sel) => {
+    qsa(sel).forEach((el) => el.classList.add('reveal'));
+  });
+
+  // Add .reveal + stagger delay classes to grid children
+  staggerSelectors.forEach((sel) => {
+    qsa(sel).forEach((el, i) => {
+      el.classList.add('reveal');
+      const delay = Math.min(i + 1, 4); // cap at delay-4
+      el.classList.add(`reveal-delay-${delay}`);
+    });
+  });
+
+  // Observe
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+  );
+
+  qsa('.reveal').forEach((el) => observer.observe(el));
+}
+
+/* ─────────────────────────────────────────
+   12. SCROLL PROGRESS BAR
+───────────────────────────────────────── */
+function initScrollProgress() {
+  if (window.parent !== window) return;
+  const bar = el('scrollProgress');
+  if (!bar) return;
+
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    bar.style.width = progress + '%';
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+}
+
+/* ─────────────────────────────────────────
+   13. SMOOTH PAGE ENTRANCE
+───────────────────────────────────────── */
+function initPageEntrance() {
+  if (window.parent !== window) return;
+  document.body.classList.remove('page-loading');
+  document.body.classList.add('page-loaded');
+}
+
+/* ─────────────────────────────────────────
+   14. BUTTON RIPPLE EFFECT
+───────────────────────────────────────── */
+function initRippleEffect() {
+  const rippleSelectors = '.btn-primary, .btn-outline, .btn-send, .nav-resume-btn, .filter-tab';
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest(rippleSelectors);
+    if (!btn) return;
+
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 2;
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+
+    const circle = document.createElement('span');
+    circle.className = 'ripple-circle';
+    circle.style.width = circle.style.height = size + 'px';
+    circle.style.left = x + 'px';
+    circle.style.top = y + 'px';
+
+    btn.appendChild(circle);
+    circle.addEventListener('animationend', () => circle.remove());
+  });
+}
+
+/* ─────────────────────────────────────────
+   15. MAGNETIC HOVER ON BUTTONS
+───────────────────────────────────────── */
+function initMagneticButtons() {
+  if (window.parent !== window) return;
+
+  const magneticEls = qsa('.btn-primary, .btn-outline, .btn-send, .nav-resume-btn');
+  const STRENGTH = 0.3; // how much the button follows the cursor
+
+  magneticEls.forEach((btn) => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) * STRENGTH;
+      const dy = (e.clientY - cy) * STRENGTH;
+      btn.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+    });
+  });
+}
+
+/* ─────────────────────────────────────────
+   16. 3D TILT ON CARDS
+───────────────────────────────────────── */
+function initCardTilt() {
+  if (window.parent !== window) return;
+
+  const cards = qsa('.project-card, .expertise-card, .about-card');
+  const MAX_TILT = 6; // degrees
+
+  cards.forEach((card) => {
+    card.classList.add('tilt-card');
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const midX = rect.width / 2;
+      const midY = rect.height / 2;
+      const rotateY = ((x - midX) / midX) * MAX_TILT;
+      const rotateX = ((midY - y) / midY) * MAX_TILT;
+
+      card.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+}
+
+/* ─────────────────────────────────────────
+   17. PARALLAX HERO
+───────────────────────────────────────── */
+function initParallaxHero() {
+  if (window.parent !== window) return;
+
+  const photoCard = document.querySelector('.hero-photo-card');
+  const heroSection = document.querySelector('.hero');
+  if (!photoCard || !heroSection) return;
+
+  function onScroll() {
+    const rect = heroSection.getBoundingClientRect();
+    // Only apply parallax while hero is visible
+    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+    const scrolled = window.scrollY;
+    const offset = scrolled * 0.15; // subtle parallax factor
+    photoCard.style.transform = `translateY(${offset}px)`;
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+}
+
+/* ─────────────────────────────────────────
    INIT
 ───────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
@@ -537,4 +761,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initContactForm();
   initMobilePreview();
   initCrossFrameSync();
+  initScrollReveal();
+  initScrollProgress();
+  initPageEntrance();
+  initRippleEffect();
+  initMagneticButtons();
+  initCardTilt();
+  initParallaxHero();
 });
