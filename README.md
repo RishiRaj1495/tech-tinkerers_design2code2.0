@@ -19,6 +19,12 @@ We took a wireframe, brought it to life, and shipped it - no frameworks, no shor
 ![Desktop](assets/screenshot-desktop.png)
 
 </div>
+</br>
+
+> Mobile Window
+<div align="center">
+  <img width="1918" height="1078" alt="image" src="https://github.com/user-attachments/assets/997cb240-37c9-41f7-a05c-5815b8b61087" />
+</div>
 
 
 ---
