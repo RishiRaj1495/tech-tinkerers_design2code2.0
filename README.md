@@ -144,6 +144,13 @@ open index.html
 </table>
 </div>
 
+## 🖼️ Wireframes
+<p align="center">
+  <a href="https://www.figma.com/design/WkLssXxXDzrscMeAunsLnz/TECH-TINKERERS">
+    <img src="assets/wireframe.png" alt="TRAJECTORY Wireframe – View in Figma" width="100%"/>
+  </a>
+</p>
+
 ## 📄 License
 
 Open source under the [MIT License](LICENSE).
